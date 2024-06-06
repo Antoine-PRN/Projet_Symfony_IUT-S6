@@ -16,3 +16,4 @@ class EventController extends AbstractController
         ]);
     }
 }
+ 
