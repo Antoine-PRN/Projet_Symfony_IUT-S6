@@ -1,0 +1,14 @@
+{# templates/registration/register.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Création de compte
+{% endblock %}
+
+{% block body %}
+	<h1>Créez votre compte</h1>
+	{{ form_start(form) }}
+	{{ form_widget(form) }}
+	<button class="btn btn-primary">Création de compte</button>
+	{{ form_end(form) }}
+{% endblock %}
+

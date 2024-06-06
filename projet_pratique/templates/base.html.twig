@@ -8,10 +8,50 @@
 			{% block title %}Bienvenue!
 			{% endblock %}
 		</title>
-		<!-- Inclure le CSS de Bootstrap -->
 		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 		<link rel="stylesheet" href="{{ asset('style/navbar.css') }}">
 		<link rel="stylesheet" href="{{ asset('style/index.css') }}">
+		<style>
+			/* Palette de couleurs */
+			.primary-color {
+				color: #3B5998;
+			}
+			.secondary-color {
+				color: #F06225;
+			}
+			.primary-button {
+				background-color: #3B5998;
+				border-color: #3B5998;
+			}
+			.primary-button:hover {
+				background-color: #F06225;
+				border-color: #F06225;
+			}
+			.navbar-custom {
+				background-color: #3B5998;
+			}
+			.navbar-custom .navbar-brand,
+			.navbar-custom .nav-link {
+				color: white;
+			}
+			.navbar-custom .navbar-brand:hover,
+			.navbar-custom .nav-link:hover {
+				color: #F06225;
+			}
+			.navbar-custom .navbar-toggler {
+				border-color: rgba(255, 255, 255, 0.1);
+			}
+			.navbar-custom .navbar-toggler-icon {
+				background-image: url("data:image/svg+xml;charset=utf8, %3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+			}
+			body {
+				background-color: #F5F5F5;
+				color: #333333;
+			}
+			.container {
+				margin-top: 20px;
+			}
+		</style>
 	</head>
 	<body>
 		<nav class="navbar navbar-expand-lg navbar-custom">
@@ -30,54 +70,33 @@
 						<a class="nav-link" href="{{ path('home') }}">Accueil</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#">Événements</a>
+						<a class="nav-link" href="{{ path('event_create') }}">Créer Événement</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#">Connexion</a>
+						<a class="nav-link" href="{{ path('event_list') }}">Liste des Événements</a>
 					</li>
+					{% if app.user %}
+						<li class="nav-item">
+							<a class="nav-link" href="#">Profil</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{{ path('app_logout') }}">Logout</a>
+						</li>
+					{% else %}
+						<li class="nav-item">
+							<a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{{ path('app_registration') }}">Create Account</a>
+						</li>
+					{% endif %}
 				</ul>
 			</div>
 		</nav>
-
 		<div class="container"> {% block body %}{% endblock %}
 			</div>
-
-			<!-- Inclure le JavaScript de Bootstrap et ses dépendances -->
-		 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-			 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+			 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+		 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 			 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 		</body>
-
-		<style>
-			body {
-				background-color: #F5F5F5;
-				color: #333333;
-			}
-
-			.navbar-custom {
-				background-color: #3B5998;
-			}
-
-			.navbar-custom .navbar-brand,
-			.navbar-custom .nav-link {
-				color: white;
-			}
-
-			.navbar-custom .navbar-brand:hover,
-			.navbar-custom .nav-link:hover {
-				color: #F06225;
-			}
-
-			.navbar-custom .navbar-toggler {
-				border-color: rgba(255, 255, 255, 0.1);
-			}
-
-			.navbar-custom .navbar-toggler-icon {
-				background-image: url("data:image/svg+xml;charset=utf8, %3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-			}
-
-			.container {
-				margin-top: 20px;
-			}
-		</style>
 	</html>
