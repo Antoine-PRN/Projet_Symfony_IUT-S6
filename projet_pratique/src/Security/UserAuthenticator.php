@@ -22,13 +22,17 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
+    private UrlGeneratorInterface $urlGenerator;
+
+    public function __construct(UrlGeneratorInterface $urlGenerator)
     {
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function authenticate(Request $request): Passport
     {
         $email = $request->request->get('email', '');
+        dump($email);
 
         $request->getSession()->set(Security::LAST_USERNAME, $email);
 
@@ -48,9 +52,8 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        // For example:
-        // return new RedirectResponse($this->urlGenerator->generate('some_route'));
-        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        // Redirection après authentification réussie
+        return new RedirectResponse($this->urlGenerator->generate('home')); // Remplacez 'home' par le nom de votre route de redirection
     }
 
     protected function getLoginUrl(Request $request): string

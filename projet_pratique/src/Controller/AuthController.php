@@ -63,4 +63,5 @@ class AuthController extends AbstractController
             'error' => $error,
         ]);
     }
+
 }
