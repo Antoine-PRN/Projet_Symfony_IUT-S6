@@ -14,29 +14,33 @@ class EventController extends AbstractController
 {
     private $doctrine;
 
-    public function __construct(ManagerRegistry $doctrine) {
+    public function __construct(ManagerRegistry $doctrine)
+    {
         $this->doctrine = $doctrine;
     }
-    
-    #[Route('/event/create', name: 'event_create')]
-    public function create(Request $request): Response
+
+    #[Route('/event/new', name: 'event_new')]
+    public function new(Request $request, ManagerRegistry $doctrine): Response
     {
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
-
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $event = $form->getData();
 
-            $entityManager = $this->doctrine->getManager();
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Assigner le créateur (utilisateur connecté)
+            $user = $this->getUser();
+            $event->setCreator($user);
+
+            // Sauvegarder l'événement dans la base de données
+            $entityManager = $doctrine->getManager();
             $entityManager->persist($event);
             $entityManager->flush();
 
             return $this->redirectToRoute('home');
         }
 
-        return $this->render('event/create.html.twig', [
-            'controller_name' => 'EventController',
+        return $this->render('event/new.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 

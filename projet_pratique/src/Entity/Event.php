@@ -46,6 +46,12 @@ class Event
     #[ORM\JoinColumn(nullable: false)]
     private $creator;
 
+    public function __construct()
+    {
+        // Attribuer une valeur par défaut à l'id_creator
+        $this->creator = 1; // Mettez ici l'ID de l'utilisateur par défaut
+    }
+
     // Getters and Setters
 
     public function getId(): ?int
@@ -113,15 +119,16 @@ class Event
         return $this;
     }
 
-    public function getCreator(): ?User
+    public function getCreator(): ?int
     {
         return $this->creator;
     }
 
-    public function setCreator(?User $creator): self
+    public function setCreator(?int $creator): self
     {
         $this->creator = $creator;
 
         return $this;
     }
+
 }

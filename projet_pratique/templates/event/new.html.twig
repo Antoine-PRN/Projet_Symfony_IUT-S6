@@ -1,0 +1,51 @@
+{# templates/event/new.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer Événement
+{% endblock %}
+
+{% block body %}
+	<h1>Créer un nouvel événement</h1>
+	{{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+	<div class="form-group">
+		{{ form_label(form.title, 'Titre', {'label_attr': {'class': 'control-label'}}) }}
+		<div class="col-sm-10">
+			{{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+			{{ form_errors(form.title) }}
+		</div>
+	</div>
+	<div class="form-group">
+		{{ form_label(form.description, 'Description', {'label_attr': {'class': 'control-label'}}) }}
+		<div class="col-sm-10">
+			{{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+			{{ form_errors(form.description) }}
+		</div>
+	</div>
+	<div class="form-group">
+		{{ form_label(form.date, 'Date et Heure', {'label_attr': {'class': 'control-label'}}) }}
+		<div class="col-sm-10">
+			{{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+			{{ form_errors(form.date) }}
+		</div>
+	</div>
+	<div class="form-group">
+		{{ form_label(form.maxParticipants, 'Nombre de participants maximum', {'label_attr': {'class': 'control-label'}}) }}
+		<div class="col-sm-10">
+			{{ form_widget(form.maxParticipants, {'attr': {'class': 'form-control'}}) }}
+			{{ form_errors(form.maxParticipants) }}
+		</div>
+	</div>
+	<div class="form-group">
+		{{ form_label(form.isPublic, 'Événement Public', {'label_attr': {'class': 'control-label'}}) }}
+		<div class="col-sm-10">
+			{{ form_widget(form.isPublic, {'attr': {'class': 'form-check-input'}}) }}
+			{{ form_errors(form.isPublic) }}
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-lg primary-button btn-block">{{ form.vars.value.id ? 'Modifier' : 'Créer' }}</button>
+		</div>
+	</div>
+	{{ form_end(form) }}
+{% endblock %}
