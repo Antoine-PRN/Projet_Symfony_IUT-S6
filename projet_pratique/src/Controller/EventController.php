@@ -8,35 +8,45 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Event;
 use App\Form\EventType;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\Security;
 
 class EventController extends AbstractController
 {
+    private $entityManager;
+    private $security;
     private $doctrine;
 
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, EntityManagerInterface $entityManager, Security $security)
     {
         $this->doctrine = $doctrine;
+        $this->entityManager = $entityManager;
+        $this->security = $security;
     }
 
     #[Route('/event/new', name: 'event_new')]
-    public function new(Request $request, ManagerRegistry $doctrine): Response
+    public function create(Request $request): Response
     {
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Assigner le créateur (utilisateur connecté)
-            $user = $this->getUser();
-            $event->setCreator($user);
+            // Récupérer l'utilisateur connecté
+            $user = $this->security->getUser();
+            if ($user) {
+                $event->setCreator($user);
+            } else {
+                // Gérer le cas où l'utilisateur n'est pas connecté
+                // Par exemple, en renvoyant une erreur ou en redirigeant vers la page de connexion
+                throw new \Exception('L\'utilisateur doit être connecté pour créer un événement.');
+            }
 
-            // Sauvegarder l'événement dans la base de données
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($event);
-            $entityManager->flush();
+            $this->entityManager->persist($event);
+            $this->entityManager->flush();
 
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('event_list');
         }
 
         return $this->render('event/new.html.twig', [

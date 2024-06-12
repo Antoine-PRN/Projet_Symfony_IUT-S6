@@ -95,12 +95,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRoles(): array
-    {
-        // Implement the logic to return the roles of the user.
-        return [];
-    }
-
     public function eraseCredentials()
     {
         // Implement the logic to erase sensitive user data.
@@ -110,5 +104,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // Implement the logic to return the user identifier.
         return '';
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
     }
 }

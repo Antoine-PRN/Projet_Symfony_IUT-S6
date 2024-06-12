@@ -6,7 +6,7 @@ use App\Repository\EventRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: "App\Repository\EventRepository")]
+#[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
 {
     #[ORM\Id]
@@ -45,12 +45,6 @@ class Event
     #[ORM\ManyToOne(targetEntity: "App\Entity\User", inversedBy: "events")]
     #[ORM\JoinColumn(nullable: false)]
     private $creator;
-
-    public function __construct()
-    {
-        // Attribuer une valeur par défaut à l'id_creator
-        $this->creator = 1; // Mettez ici l'ID de l'utilisateur par défaut
-    }
 
     // Getters and Setters
 
@@ -119,16 +113,15 @@ class Event
         return $this;
     }
 
-    public function getCreator(): ?int
+    public function getCreator(): ?User
     {
         return $this->creator;
     }
 
-    public function setCreator(?int $creator): self
+    public function setCreator(?User $creator): self
     {
         $this->creator = $creator;
 
         return $this;
     }
-
 }
