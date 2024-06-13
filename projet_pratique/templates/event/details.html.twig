@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'événement
+{% endblock %}
+
+{% block body %}
+	<h1>{{ event.title }}</h1>
+	<p>{{ event.date|date('d/m/Y') }}</p>
+	<p>{{ event.description }}</p>
+	<p>Status:
+		{{ event.isPublic ? 'Public' : 'Privé' }}</p>
+
+	{% if app.user %}
+		{# <form action="{{ path('event_edit', {id: event.id}) }}" method="post"> #}
+		<form action"#">
+			<button type="submit" class="btn btn-primary">S'inscrire</button>
+		</form>
+	{% else %}
+		<p>Connectez-vous pour vous inscrire.</p>
+	{% endif %}
+
+	{% if app.user == event.creator %}
+		<a href="{{ path('event_edit', {'id': event.id}) }}">
+			<button>Modifier</button>
+		</a>
+		<form action="{{ path('event_delete', {id: event.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');" style="display: inline;">
+			<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+			<a href="{{ path('event_delete', {'id': event.id}) }}">
+				<button>Supprimer</button>
+			</a>
+		</form>
+	{% endif %}
+
+
+{% endblock %}

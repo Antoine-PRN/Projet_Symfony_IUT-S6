@@ -1,18 +1,151 @@
-{# templates/event/list.html.twig #}
-
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des événements
+{% block title %}Liste des Événements
 {% endblock %}
 
 {% block body %}
-	<h1>Liste des événements</h1>
-	<ul>
-		{% for event in events %}
-			<li>{{ event.title }}
-				-
-				{{ event.date|date('d/m/Y H:i') }}</li>
-		{% endfor %}
-	</ul>
-{% endblock %}
+	<h1>Liste des Événements</h1>
 
+	<div class="row">
+		{% for event in events %}
+			<div class="col-md-4 col-sm-6 mb-4 bg-none">
+				<div class="card">
+					<div class="card-inner">
+						<div class="card-front">
+							<h5 class="event-title">{{ event.title }}</h5>
+							<p class="event-public">(
+								{% if event.isPublic == 1 %}
+									Public
+								{% else %}
+									Privé
+								{% endif %}
+								)</p>
+							<p class="event-date">{{ event.date|date('d/m/Y') }}</p>
+						</div>
+						<div class="card-back">
+							<p>{{ event.description }}</p>
+							<a href="{{ path('event_show', {'id': event.id}) }}">
+								<button class="btn">Voir plus</button>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+		<div class="col-md-4 col-sm-6 mb-4">
+			<a href="{{ path('event_new') }}" class="create-event-card">
+				<div class="create-card">
+					<div class="card-inner">
+						<div class="card-front">
+							<div class="plus-sign">+</div>
+						</div>
+					</div>
+				</div>
+			</a>
+		</div>
+	</div>
+
+	<nav aria-label="Page navigation">
+		<ul class="pagination">
+			{% for i in 1..maxPages %}
+				<li class="page-item {% if i == currentPage %}active{% endif %}">
+					<a class="page-link" href="{{ path('event_list', {page: i}) }}">{{ i }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</nav>
+
+	<style>
+		.event-title {
+			font-size: 24px;
+			font-weight: bold;
+		}
+
+		.event-date {
+			font-size: 18px;
+			font-style: italic;
+		}
+
+		.event-public {
+			font-size: 18px;
+			font-style: italic;
+		}
+
+		.card {
+			width: 100%;
+			height: 200px;
+			perspective: 1000px;
+		}
+
+		.card-inner {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			transform-style: preserve-3d;
+			transition: transform 0.999s;
+		}
+
+		.card:hover .card-inner {
+			transform: rotateY(180deg);
+		}
+
+		.card-front,
+		.card-back {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			backface-visibility: hidden;
+		}
+
+		.card-front {
+			background-color: #3B5998;
+			color: #fff;
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			border: 10px solid #3B5998;
+			border-radius: 10px;
+			justify-content: center;
+			font-size: 24px;
+			transform: rotateY(0deg);
+		}
+
+		.card-back {
+			background-color: #F06225;
+			color: #fff;
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			border: 10px solid #F06225;
+			border-radius: 10px;
+			justify-content: center;
+			font-size: 24px;
+			transform: rotateY(180deg);
+		}
+
+		.create-card {
+			width: 100%;
+			height: 200px;
+			perspective: 1000px;
+			font-size: 75px;
+		}
+
+		.pagination .page-item.active .page-link {
+			background-color: #3B5998;
+			border-color: #3B5998;
+			color: #fff;
+		}
+
+		.pagination .page-link {
+			color: #3B5998;
+		}
+
+		.pagination .page-link:hover {
+			color: #F06225;
+		}
+
+		.pagination .page-item.active .page-link:hover {
+			color: #F06225;
+		}
+	</style>
+{% endblock %}

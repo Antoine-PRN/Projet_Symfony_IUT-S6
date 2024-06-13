@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 class User implements PasswordAuthenticatedUserInterface, UserInterface
+
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -97,13 +98,12 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     public function eraseCredentials()
     {
-        // Implement the logic to erase sensitive user data.
+        $this->plainPassword = null;
     }
 
     public function getUserIdentifier(): string
     {
-        // Implement the logic to return the user identifier.
-        return '';
+        return $this->email;
     }
 
     public function getRoles(): array

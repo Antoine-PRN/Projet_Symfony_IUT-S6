@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 

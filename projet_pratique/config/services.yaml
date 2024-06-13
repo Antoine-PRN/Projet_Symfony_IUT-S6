@@ -20,5 +20,9 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Security\Voter\EventVoter:
+        tags:
+            - { name: 'security.voter' }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
