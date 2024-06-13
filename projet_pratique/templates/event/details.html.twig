@@ -10,26 +10,65 @@
 	<p>Status:
 		{{ event.isPublic ? 'Public' : 'Privé' }}</p>
 
-	{% if app.user %}
-		{# <form action="{{ path('event_edit', {id: event.id}) }}" method="post"> #}
-		<form action"#">
-			<button type="submit" class="btn btn-primary">S'inscrire</button>
-		</form>
-	{% else %}
-		<p>Connectez-vous pour vous inscrire.</p>
-	{% endif %}
+	<div class="options-box">
+		{% if app.user %}
+			{# <form action="{{ path('event_register', {'id': event.id}) }}" method="post" style="margin-right: 10px;"> #}
+			<form action"#" style="margin-right: 10px;">
+				<button type="submit" class="btn primary-button">S'inscrire</button>
+			</form>
+		{% else %}
+			<p>Connectez-vous pour vous inscrire.</p>
+		{% endif %}
 
-	{% if app.user == event.creator %}
-		<a href="{{ path('event_edit', {'id': event.id}) }}">
-			<button>Modifier</button>
-		</a>
-		<form action="{{ path('event_delete', {id: event.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');" style="display: inline;">
-			<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
-			<a href="{{ path('event_delete', {'id': event.id}) }}">
-				<button>Supprimer</button>
+		{% if app.user == event.creator %}
+			<a href="{{ path('event_edit', {'id': event.id}) }}" style="margin-right: 10px;">
+				<button class="btn update-btn">Modifier</button>
 			</a>
-		</form>
-	{% endif %}
+			<form action="{{ path('event_delete', {'id': event.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">
+				<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+				<button type="submit" class="btn delete-btn">Supprimer</button>
+			</form>
+		{% endif %}
+	</div>
 
+	<style>
+		.options-box {
+			display: flex;
+			justify-content: flex-start; /* Ajuster la justification selon vos préférences */
+			align-items: center;
+			margin-top: 20px; /* Espacement pour améliorer la lisibilité */
+		}
 
+		.btn {
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			border-radius: 4px;
+			font-size: 14px;
+		}
+
+		.primary-button {
+			background-color: #3B5998;
+			color: #fff;
+		}
+
+		.update-btn {
+			background-color: #F06225;
+			color: #fff;
+			margin-right: 10px; /* Espacement entre les boutons */
+		}
+
+		.delete-btn {
+			background-color: #D9534F;
+			color: #fff;
+		}
+
+		.delete-btn:hover {
+			color: #fff;
+		}
+
+		.update-btn:hover {
+			color: #fff;
+		}
+	</style>
 {% endblock %}
