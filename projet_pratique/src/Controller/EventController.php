@@ -115,8 +115,17 @@ class EventController extends AbstractController
 
         $events = $queryBuilder->getQuery()->getResult();
 
+        $eventsWithExpiry = [];
+        foreach ($events as $event) {
+            $isExpired = $event->getDate() < new \DateTime();
+            $eventsWithExpiry[] = [
+                'event' => $event,
+                'isExpired' => $isExpired,
+            ];
+        }
+
         return $this->render('event/list.html.twig', [
-            'events' => $events,
+            'eventsWithExpiry' => $eventsWithExpiry,
             'currentPage' => $page,
             'maxPages' => $maxPages,
         ]);
@@ -132,9 +141,12 @@ class EventController extends AbstractController
             throw $this->createNotFoundException('L\'événement n\'existe pas.');
         }
 
+        $isExpired = $event->getDate() < new \DateTime();
+
         return $this->render('event/details.html.twig', [
             'event' => $event,
             'capacity' => $remainingPlaces,
+            'isExpired' => $isExpired,
         ]);
     }
 
@@ -280,8 +292,19 @@ class EventController extends AbstractController
         $offset = ($page - 1) * $limit;
         $events = array_slice($registeredEvents, $offset, $limit);
 
+        // Vérification des événements expirés
+        $currentDate = new \DateTime();
+        $eventsWithExpiry = [];
+        foreach ($events as $event) {
+            $isExpired = $event->getDate() < $currentDate;
+            $eventsWithExpiry[] = [
+                'event' => $event,
+                'isExpired' => $isExpired,
+            ];
+        }
+
         return $this->render('event/registered_events.html.twig', [
-            'events' => $events,
+            'eventsWithExpiry' => $eventsWithExpiry,
             'currentPage' => $page,
             'maxPages' => $maxPages,
         ]);
