@@ -6,13 +6,15 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
 #[ORM\Table(name: '`user`')]
 class User implements PasswordAuthenticatedUserInterface, UserInterface
-
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -26,15 +28,20 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Regex(
+        pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/",
+        message: "Votre mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial ainsi qu'une longueur de plus de 8 caractères."
+    )]
     private ?string $password = null;
 
-    private $plainPassword;
+    private ?string $plainPassword = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
     private ?string $email = null;
 
     #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: "participants")]
-    private $events;
+    private Collection $events;
 
     public function __construct()
     {
@@ -92,7 +99,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         return $this->plainPassword;
     }
 
-    public function setPlainPassword(string $plainPassword): static
+    public function setPlainPassword(?string $plainPassword): static
     {
         $this->plainPassword = $plainPassword;
 

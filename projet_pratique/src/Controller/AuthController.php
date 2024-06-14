@@ -41,7 +41,7 @@ class AuthController extends AbstractController
             $entityManager->flush();
 
             // Redirect to a success page
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('login');
         }
 
         return $this->render('registration/register.html.twig', [
