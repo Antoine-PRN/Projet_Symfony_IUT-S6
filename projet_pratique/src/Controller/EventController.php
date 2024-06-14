@@ -13,6 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Security;
 use App\Repository\EventRepository;
 use App\Service\EmailService;
+use App\Service\EventCapacityCalculator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class EventController extends AbstractController
@@ -122,9 +123,10 @@ class EventController extends AbstractController
     }
 
     #[Route('/event/{id}', name: 'event_show', requirements: ['id' => '\d+'])]
-    public function show(int $id): Response
+    public function show(int $id, EventCapacityCalculator $capacityCalculator): Response
     {
         $event = $this->doctrine->getRepository(Event::class)->find($id);
+        $remainingPlaces = $capacityCalculator->calculateRemainingPlaces($event);
 
         if (!$event) {
             throw $this->createNotFoundException('L\'événement n\'existe pas.');
@@ -132,6 +134,7 @@ class EventController extends AbstractController
 
         return $this->render('event/details.html.twig', [
             'event' => $event,
+            'capacity' => $remainingPlaces,
         ]);
     }
 
