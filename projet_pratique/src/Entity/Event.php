@@ -3,7 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -46,6 +47,15 @@ class Event
     #[ORM\ManyToOne(targetEntity: "App\Entity\User", inversedBy: "events")]
     #[ORM\JoinColumn(nullable: false)]
     private $creator;
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: "events")]
+    #[ORM\JoinTable(name: "event_registrations")]
+    private $participants;
+
+    public function __construct()
+    {
+        $this->participants = new ArrayCollection();
+    }
 
     // Getters and Setters
 
@@ -124,5 +134,31 @@ class Event
         $this->creator = $creator;
 
         return $this;
+    }
+
+    public function getParticipants(): Collection
+    {
+        return $this->participants;
+    }
+
+    public function addParticipant(User $user): self
+    {
+        if (!$this->participants->contains($user)) {
+            $this->participants[] = $user;
+        }
+
+        return $this;
+    }
+
+    public function removeParticipant(User $user): self
+    {
+        $this->participants->removeElement($user);
+
+        return $this;
+    }
+
+    public function getAvailableSlots(): int
+    {
+        return $this->maxParticipants - $this->participants->count();
     }
 }

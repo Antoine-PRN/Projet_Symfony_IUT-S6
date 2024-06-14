@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Security;
 use App\Repository\EventRepository;
+use App\Service\EmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class EventController extends AbstractController
@@ -19,12 +20,14 @@ class EventController extends AbstractController
     private $entityManager;
     private $security;
     private $doctrine;
+    private $emailService;
 
-    public function __construct(ManagerRegistry $doctrine, EntityManagerInterface $entityManager, Security $security)
+    public function __construct(ManagerRegistry $doctrine, EntityManagerInterface $entityManager, Security $security, EmailService $emailService)
     {
         $this->doctrine = $doctrine;
         $this->entityManager = $entityManager;
         $this->security = $security;
+        $this->emailService = $emailService;
     }
 
     private function canEditEvent(Event $event): bool
@@ -180,5 +183,76 @@ class EventController extends AbstractController
         $entityManager->flush();
 
         return $this->redirectToRoute('event_list');
+    }
+
+    #[Route('/event/{id}/register', name: 'event_register', requirements: ['id' => '\d+'])]
+    public function register(int $id): Response
+    {
+        $event = $this->doctrine->getRepository(Event::class)->find($id);
+        if (!$event) {
+            throw $this->createNotFoundException('L\'événement n\'existe pas.');
+        }
+
+        $user = $this->security->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour vous inscrire à cet événement.');
+        }
+
+        if (!$user instanceof \App\Entity\User) {
+            throw new \LogicException('The user is not an instance of the expected User class.');
+        }
+
+        if ($event->getAvailableSlots() <= 0) {
+            $this->addFlash('error', 'Il n\'y a plus de places disponibles pour cet événement.');
+            return $this->redirectToRoute('event_show', ['id' => $id]);
+        }
+
+        $event->addParticipant($user);
+        $this->entityManager->flush();
+
+        // Test email sending
+        try {
+            $this->emailService->sendEmail($user->getEmail(), 'Confirmation d\'inscription', 'Vous êtes inscrit à l\'événement: ' . $event->getTitle());
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email de confirmation.');
+        }
+
+        $this->addFlash('success', 'Vous êtes inscrit à l\'événement.');
+        return $this->redirectToRoute('event_show', ['id' => $id]);
+    }
+
+    #[Route('/event/{id}/unregister', name: 'event_unregister', requirements: ['id' => '\d+'])]
+    public function unregister(int $id): Response
+    {
+        $event = $this->doctrine->getRepository(Event::class)->find($id);
+        if (!$event) {
+            throw $this->createNotFoundException('L\'événement n\'existe pas.');
+        }
+
+        $user = $this->security->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour annuler votre inscription.');
+        }
+
+        if (!$user instanceof \App\Entity\User) {
+            throw new \LogicException('The user is not an instance of the expected User class.');
+        }
+
+        if (!$event->getParticipants()->contains($user)) {
+            $this->addFlash('error', 'Vous n\'êtes pas inscrit à cet événement.');
+            return $this->redirectToRoute('event_show', ['id' => $id]);
+        }
+
+        $event->removeParticipant($user);
+        $this->entityManager->flush();
+
+        try {
+            $this->emailService->sendEmail($user->getEmail(), 'Confirmation d\'annulation', 'Votre inscription à l\'événement: ' . $event->getTitle() . ' a été annulée.');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email de confirmation d\'annulation.');
+        }
+
+        $this->addFlash('success', 'Votre inscription a été annulée.');
+        return $this->redirectToRoute('event_show', ['id' => $id]);
     }
 }

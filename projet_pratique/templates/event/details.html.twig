@@ -9,13 +9,25 @@
 	<p>{{ event.description }}</p>
 	<p>Status:
 		{{ event.isPublic ? 'Public' : 'Privé' }}</p>
+	<p>Places disponibles:
+		{{ event.availableSlots }}</p>
+
 
 	<div class="options-box">
 		{% if app.user %}
-			{# <form action="{{ path('event_register', {'id': event.id}) }}" method="post" style="margin-right: 10px;"> #}
-			<form action"#" style="margin-right: 10px;">
-				<button type="submit" class="btn primary-button">S'inscrire</button>
-			</form>
+			{% if event.participants.contains(app.user) %}
+				<form action="{{ path('event_unregister', {id: event.id}) }}" method="post" style="margin-right: 1.5em">
+					<button type="submit" class="btn primary-button">Annuler l'inscription</button>
+				</form>
+			{% else %}
+				{% if event.availableSlots > 0 %}
+					<form action="{{ path('event_register', {id: event.id}) }}" method="post" style="margin-right: 1.5em">
+						<button type="submit" class="btn primary-button">S'inscrire</button>
+					</form>
+				{% else %}
+					<p>L'événement est complet.</p>
+				{% endif %}
+			{% endif %}
 		{% else %}
 			<p>Connectez-vous pour vous inscrire.</p>
 		{% endif %}
