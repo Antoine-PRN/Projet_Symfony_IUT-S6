@@ -21,6 +21,17 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
+    public function findUpcomingEvents(int $limit = 3): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.date >= :today')
+            ->setParameter('today', new \DateTime('today'))
+            ->orderBy('e.date', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Event[] Returns an array of Event objects
     //     */

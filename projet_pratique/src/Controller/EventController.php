@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Event;
+use App\Entity\User;
 use App\Form\EventType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,7 +15,6 @@ use Symfony\Component\Security\Core\Security;
 use App\Repository\EventRepository;
 use App\Service\EmailService;
 use App\Service\EventCapacityCalculator;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class EventController extends AbstractController
 {
@@ -257,5 +257,33 @@ class EventController extends AbstractController
 
         $this->addFlash('success', 'Votre inscription a été annulée.');
         return $this->redirectToRoute('event_show', ['id' => $id]);
+    }
+
+    #[Route('/events/registered', name: 'event_registered')]
+    public function registeredEvents(Request $request): Response
+    {
+        // Récupérer l'utilisateur connecté
+        $user = $this->getUser();
+
+        // Récupérer tous les événements inscrits de l'utilisateur
+        $registeredEvents = $user->getEvents()->toArray();
+
+        // Paginer les résultats
+        $page = $request->query->getInt('page', 1); // Numéro de la page, 1 par défaut
+        $limit = 5; // Nombre d'événements par page
+
+        // Calculer le nombre total d'événements inscrits
+        $totalEvents = count($registeredEvents);
+        $maxPages = ceil($totalEvents / $limit);
+
+        // Pagination manuelle
+        $offset = ($page - 1) * $limit;
+        $events = array_slice($registeredEvents, $offset, $limit);
+
+        return $this->render('event/registered_events.html.twig', [
+            'events' => $events,
+            'currentPage' => $page,
+            'maxPages' => $maxPages,
+        ]);
     }
 }

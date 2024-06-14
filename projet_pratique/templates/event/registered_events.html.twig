@@ -1,14 +1,14 @@
-{# templates/home/index.html.twig #}
+{# templates/event/registered.html.twig #}
 
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil
+{% block title %}Événements Inscrits
 {% endblock %}
 
 {% block body %}
-	<h1 style="text-align: left">Évènements à venir</h1>
+	<h1 style="margin: 1.5em 0">Mes Événements Inscrits</h1>
 
-	<div class="upcoming-events">
+	{% if events|length > 0 %}
 		{% for event in events %}
 			<div class="col-md-4 col-sm-6 mb-4 bg-none">
 				<div class="card">
@@ -34,17 +34,23 @@
 				</div>
 			</div>
 		{% endfor %}
+	{% else %}
+		<p>Vous n'êtes inscrit à aucun événement pour le moment.</p>
+	{% endif %}
 
+	{% if maxPages > 0 %}
+		<nav aria-label="Page navigation">
+			<ul class="pagination">
+				{% for i in 1..maxPages %}
+					<li class="page-item {% if i == currentPage %}active{% endif %}">
+						<a class="page-link" href="{{ path('event_list', {page: i}) }}">{{ i }}</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</nav>
+	{% endif %}
 
-	</div>
 	<style>
-		.upcoming-events {
-			margin-top: 50px;
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: space-between;
-			text-align: left;
-		}
 		.event-title {
 			font-size: 24px;
 			font-weight: bold;
@@ -117,6 +123,24 @@
 			height: 200px;
 			perspective: 1000px;
 			font-size: 75px;
+		}
+
+		.pagination .page-item.active .page-link {
+			background-color: #3B5998;
+			border-color: #3B5998;
+			color: #fff;
+		}
+
+		.pagination .page-link {
+			color: #3B5998;
+		}
+
+		.pagination .page-link:hover {
+			color: #F06225;
+		}
+
+		.pagination .page-item.active .page-link:hover {
+			color: #F06225;
 		}
 	</style>
 

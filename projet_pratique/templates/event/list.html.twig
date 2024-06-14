@@ -6,6 +6,10 @@
 {% block body %}
 	<h1>Liste des Événements</h1>
 
+	<a href="{{ path('event_registered')}}">
+		<h4>Vois mes inscriptions</h4>
+	</a>
+
 	<div class="row">
 		{% for event in events %}
 			<div class="col-md-4 col-sm-6 mb-4 bg-none">
