@@ -7,6 +7,14 @@
 
 {% block body %}
 	<div class="container">
+		<p style="font-size: 18px; margin: 1em 0;">
+			<a href="{{ path('home') }}" style="color: #F06225; text-decoration: none;">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-short" viewbox="0 0 16 16">
+					<path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"/>
+				</svg>
+				Retour
+			</a>
+		</p>
 		<h1 class="primary-color">Mon Profil</h1>
 		{{ form_start(form) }}
 		<div class="form-group">
@@ -28,6 +36,16 @@
 			{{ form_label(form.password) }}
 			{{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
 			{{ form_errors(form.password) }}
+		</div>
+		<div class="form-group">
+			{{ form_label(form.newPassword) }}
+			{{ form_widget(form.newPassword, {'attr': {'class': 'form-control'}}) }}
+			{{ form_errors(form.newPassword) }}
+		</div>
+		<div class="form-group">
+			{{ form_label(form.newPasswordConfirm) }}
+			{{ form_widget(form.newPasswordConfirm, {'attr': {'class': 'form-control'}}) }}
+			{{ form_errors(form.newPasswordConfirm) }}
 		</div>
 		<div class="form-group">
 			{{ form_widget(form.submit, {'attr': {'class': 'btn primary-button'}}) }}
