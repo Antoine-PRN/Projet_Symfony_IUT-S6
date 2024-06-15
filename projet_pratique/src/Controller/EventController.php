@@ -15,6 +15,9 @@ use Symfony\Component\Security\Core\Security;
 use App\Repository\EventRepository;
 use App\Service\EmailService;
 use App\Service\EventCapacityCalculator;
+use App\Service\PaymentService;
+use Stripe\Charge;
+use Stripe\Stripe;
 
 class EventController extends AbstractController
 {
@@ -22,13 +25,15 @@ class EventController extends AbstractController
     private $security;
     private $doctrine;
     private $emailService;
+    private $paymentService;
 
-    public function __construct(ManagerRegistry $doctrine, EntityManagerInterface $entityManager, Security $security, EmailService $emailService)
+    public function __construct(ManagerRegistry $doctrine, EntityManagerInterface $entityManager, Security $security, EmailService $emailService, PaymentService $paymentService)
     {
         $this->doctrine = $doctrine;
         $this->entityManager = $entityManager;
         $this->security = $security;
         $this->emailService = $emailService;
+        $this->paymentService = $paymentService;
     }
 
     private function canEditEvent(Event $event): bool
@@ -73,6 +78,14 @@ class EventController extends AbstractController
                 $event->setCreator($user);
             } else {
                 throw new \Exception('L\'utilisateur doit être connecté pour créer un événement.');
+            }
+
+            // Gérer la logique de is_paid en fonction de cost
+            $cost = $form->get('cost')->getData();
+            if (!empty($cost) && $cost > 0) {
+                $event->setIsPaid(true);
+            } else {
+                $event->setIsPaid(false);
             }
 
             $this->entityManager->persist($event);
@@ -308,5 +321,73 @@ class EventController extends AbstractController
             'currentPage' => $page,
             'maxPages' => $maxPages,
         ]);
+    }
+
+
+
+    #[Route('/event/{id}/payment', name: 'event_payment')]
+    public function payment($id): Response
+    {
+        $event = $this->entityManager->getRepository(Event::class)->find($id);
+
+        if (!$event) {
+            throw $this->createNotFoundException('L\'événement n\'existe pas.');
+        }
+
+        return $this->render('event/payment.html.twig', [
+            'event' => $event,
+            'stripe_public_key' => $this->getParameter('stripe_public_key')
+        ]);
+    }
+
+    #[Route('/event/{id}/register_payment', name: 'event_register_payment')]
+    public function registerPayment($id, Request $request): Response
+    {
+        $event = $this->entityManager->getRepository(Event::class)->find($id);
+
+        if (!$event) {
+            throw $this->createNotFoundException('L\'événement n\'existe pas.');
+        }
+
+        $token = $request->request->get('stripeToken');
+
+        try {
+            // Process payment with PaymentService
+            $charge = $this->paymentService->processPayment($event->getCost(), $token);
+
+            // Handle success scenario (update database, send confirmation email, etc.)
+            // $this->handlePaymentSuccess($event, $charge);
+
+            return $this->redirectToRoute('event_payment_success', ['id' => $event->getId()]);
+        } catch (\Exception $e) {
+            // Handle payment failure
+            return $this->redirectToRoute('event_payment_failure', ['id' => $event->getId()]);
+        }
+    }
+
+    #[Route('/event/{id}/payment/success', name: 'event_payment_success')]
+    public function paymentSuccess(Event $event): Response
+    {
+        // Afficher une page de confirmation de paiement réussi
+        return $this->render('event/payment_success.html.twig', [
+            'event' => $event,
+        ]);
+    }
+
+    /**
+     * @Route("/event/{id}/payment/failure", name="event_payment_failure")
+     */
+    #[Route('/event/{id}/payment/failure', name: 'event_payment_failure')]
+    public function paymentFailure(Event $event): Response
+    {
+        // Afficher une page d'échec de paiement
+        return $this->render('event/payment_failure.html.twig', [
+            'event' => $event,
+        ]);
+    }
+
+    private function sendPaymentConfirmationEmail(Event $event, Charge $charge, User $user)
+    {
+        $this->emailService->sendEmail($user->getEmail(), 'Confirmation de paiment', 'Le paiement pour la participation a l\'événement ' . $event->getTitle() . ', d\'un montant de ' . $event->getCost() . ' euros, a été effectué.');
     }
 }

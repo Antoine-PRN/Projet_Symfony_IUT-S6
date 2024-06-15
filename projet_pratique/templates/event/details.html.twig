@@ -36,9 +36,16 @@
 				</form>
 			{% else %}
 				{% if event.availableSlots > 0 %}
-					<form action="{{ path('event_register', {id: event.id}) }}" method="post" style="margin-right: 1.5em">
-						<button type="submit" class="btn primary-button">S'inscrire</button>
-					</form>
+					{% if event.cost > 0 %}
+						<a href="{{ path('event_register_payment', {id: event.id}) }}" style="margin-right: 1.5em">
+							<button class="btn primary-button">Payer et s'inscrire ({{ event.cost }}
+								€)</button>
+						</a>
+					{% else %}
+						<form action="{{ path('event_register', {id: event.id}) }}" method="post" style="margin-right: 1.5em">
+							<button type="submit" class="btn primary-button">S'inscrire</button>
+						</form>
+					{% endif %}
 				{% else %}
 					<p>L'événement est complet.</p>
 				{% endif %}
@@ -46,6 +53,7 @@
 		{% else %}
 			<p>Connectez-vous pour vous inscrire.</p>
 		{% endif %}
+
 
 		{% if app.user == event.creator %}
 			<a href="{{ path('event_edit', {'id': event.id}) }}" style="margin-right: 10px;">

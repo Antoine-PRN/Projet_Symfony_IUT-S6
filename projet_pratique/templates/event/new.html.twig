@@ -6,7 +6,7 @@
 
 {% block body %}
 	<h1>Créer un nouvel événement</h1>
-	<p style="font-size: 18px; margin: 1em 0; ">
+	<p style="font-size: 18px; margin: 1em 0;">
 		<a href="{{ path('event_list') }}" style="color: #F06225; text-decoration: none;">
 			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-short" viewbox="0 0 16 16">
 				<path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"/>
@@ -48,6 +48,13 @@
 		<div class="col-sm-10">
 			{{ form_widget(form.isPublic, {'attr': {'class': 'form-check-input'}}) }}
 			{{ form_errors(form.isPublic) }}
+		</div>
+	</div>
+	<div class="form-group">
+		{{ form_label(form.cost, 'Coût de participation', {'label_attr': {'class': 'control-label'}}) }}
+		<div class="col-sm-10">
+			{{ form_widget(form.cost, {'attr': {'class': 'form-control'}}) }}
+			{{ form_errors(form.cost) }}
 		</div>
 	</div>
 	<div class="form-group">

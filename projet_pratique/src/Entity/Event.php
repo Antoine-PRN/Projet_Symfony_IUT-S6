@@ -52,12 +52,42 @@ class Event
     #[ORM\JoinTable(name: "event_registrations")]
     private $participants;
 
+    #[ORM\Column(type: "boolean")]
+    private $isPaid;
+
+    #[ORM\Column(type: "float", nullable: true)]
+    private $cost;
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();
     }
 
     // Getters and Setters
+
+    public function getIsPaid(): ?bool
+    {
+        return $this->isPaid;
+    }
+
+    public function setIsPaid(bool $isPaid): self
+    {
+        $this->isPaid = $isPaid;
+
+        return $this;
+    }
+
+    public function getCost(): ?float
+    {
+        return $this->cost;
+    }
+
+    public function setCost(?float $cost): self
+    {
+        $this->cost = $cost;
+
+        return $this;
+    }
 
     public function getId(): ?int
     {

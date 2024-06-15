@@ -1,0 +1,3 @@
+parameters:
+    stripe_api_key: '%env(STRIPE_API_KEY)%'
+    stripe_webhook_secret: '%env(STRIPE_WEBHOOK_SECRET)%'
